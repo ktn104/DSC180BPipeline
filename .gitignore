@@ -6,3 +6,6 @@ data
 
 # python files
 __pycache__
+
+#ignore all the notebook checkpoints 
+.ipynb_checkpoints
