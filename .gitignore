@@ -1,5 +1,5 @@
 # don't check-in data
-T2D_data
+T2D_data/
 
 # don't check-in secrets
 .env
