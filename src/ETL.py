@@ -8,53 +8,69 @@ def ftp_server_authen():
     """
     a function call to connect and authenticate a ftp server
     """
-    
     #connect to the FTP server
     ftp = ftplib.FTP("ftp.ebi.ac.uk")
     #login anonymously
     ftp.login()
-    #change the parent dir
-    parent_dir = '/pub/databases/gwas/summary_statistics'
-    ftp.cwd(parent_dir)
-    #ftp.retrlines("LIST")
+
     return ftp
 
 #grab the authenticated server
 ftp = ftp_server_authen()
 
-def ftp_server(ftp, study = None):
+def ftp_server(ftp, study_ref):
     """
     a function call to change to a specific study subdir
     """
-    assert isinstance(study, str)
-
+    #make a list to store all the sub studies directory
+    all_studies = []
+    #change the parent dir
+    parent_dir = '/pub/databases/gwas/summary_statistics/'
+    ftp.cwd(parent_dir)
+    #grab all the studies dir
+    ftp.retrlines("LIST", all_studies.append)
+    #getting one specific study
+    studyDir = study_ref + '/'
     #changing to one specific study
-    ftp.cwd('/%s' % study)
-    ftp.retrlines("LIST")
+    ftp.cwd(studyDir)
+    #ftp.retrlines("LIST")
+
 
 def get_t2d_file_names(server):
     """
     a function call to save all the useful T2D files into a list within the current directory
     """
-    directory_listing = []
+    #make a list to store all teh sub files of one specific study
     file_listing = []
     #get the list of sub-directories at the current dir and append them to a list
-    server.retrlines("LIST", directory_listing.append)
+    ftp.retrlines("LIST", file_listing.append)
     #only grab the bam files from the list 
-    file_listing = [i.split()[-1] for i in directory_listing if 'txt' == i.split()[-1][-3:]]
-    return file_listing
+    files = [i.split()[-1] for i in file_listing]
+    #grab the harmonised dir
+    harmo = [index for index, val in enumerate(files) if val == 'harmonised']
+    subdir = files[harmo[0]] + '/'
+    #go the directory
+    ftp.cwd(subdir)
+    
+    #make a list to store all teh sub files of one specific study
+    sub_files = []
+    #get the list of sub-directories at the current dir and append them to a list
+    ftp.retrlines("LIST", sub_files.append)
+    #only grab the bam files from the list 
+    tsvs = [i.split()[-1] for i in sub_files if i.split()[-1][-2:] == 'gz']
+    return tsvs
 
-def download_bam_file(filetype, outdir, study):
+def download_file(outdir, study_ref):
     """
     Function call to download bam files
     """
 
     #redirect the ftp server
     #go to one specific T2D Study with Summary Statistics
-    ftp_server(ftp, study = 'MahajanA_29632382_GCST007517')
+    ftp_server(ftp, study_ref)
 
     #dir where the downloaded data will be saved at
-    T2Ddir = "/Users/fernieqin/Desktop/DSC180B/T2D_data"
+    T2Ddir = outdir
 
     try:
         #change to the data dir
@@ -63,28 +79,28 @@ def download_bam_file(filetype, outdir, study):
         #make a new dir if not existing
         os.mkdir(T2Ddir)
         print ("Successfully created the T2D data directory")
+        #change to the T2D data dir
+        os.chdir(T2Ddir)
     else:
         print ("T2D data directory already exists")
 
-    #dir where the downloaded person data will be saved at
-    t2d_one_sub_dir = T2Ddir + "/" + study
-
     try:
-        #change to the data dir
-        os.chdir(t2d_one_sub_dir)      
+        #change to the one study dir
+        os.chdir(study_ref)      
     except OSError:
         #make a new dir if not existing
-        os.mkdir(t2d_one_sub_dir)
-        print ("Successfully created the sub directory %s" % t2d_one_sub_dir)
+        os.mkdir(study_ref)
+        print ("Successfully created the sub directory %s" % study_ref)
+        #change to the one study dir
+        os.chdir(study_ref)
     else:
-        print ("Sub directory %s already exists" % t2d_one_sub_dir)
+        print ("Sub directory %s already exists" % study_ref)
 
-    #change to the data dir
-    os.chdir(t2d_one_sub_dir)
+    one_study_files = get_t2d_file_names(ftp)
 
-    for fn in t2d_file_listing:
+    for fn in one_study_files:
         #check if the file already exists in the dir
-        if os.path.exists(t2d_one_sub_dir + '/' + fn):
+        if os.path.exists(fn):
             print("File %s already exists" % fn)
         #download the file otherwise
         else:
@@ -93,6 +109,5 @@ def download_bam_file(filetype, outdir, study):
             one_file.close()
             print("successfully downloaded the file: " + str(fn))
     
-    #return to the parent dir ready for next call
-    ftp.cwd('../')
-    print(ftp.nlst())
+    #close the ftp server after downloading for one study
+    ftp.close()

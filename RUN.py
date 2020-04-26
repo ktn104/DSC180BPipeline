@@ -1,30 +1,41 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
+import json
 import sys
-sys.path.insert(0, 'src')
-import wget
-import pandas as pd
-import os 
-from ETL import get_data
-from ETL import rename_data
-from ETL import clean_data
+import shutil
+import os
 
+sys.path.insert(0, 'src') # add library code to path
+
+from ETL import download_file #add download functions
+
+from process import process_data #add process test data func
+
+
+#load json config files
+config = 'config/data-param.json'
+
+def load_params(config_file):
+    """
+    Load the parameters from json files
+    """
+    with open(config_file) as fh:
+        param = json.load(fh)
+    return param
 
 def main(targets):
+    """
+    The main function where we run the src code.
+    """
 
-    if 'data' in targets:
-        get_data()
+    # make the fastq target
+    if 'test' in targets:
+        cfg = load_params(config)
+        #recursively downloading all the test files
+        for study in cfg['study']:
+            download_file(cfg['outpath'], study)
+    return
 
 if __name__ == '__main__':
     targets = sys.argv[1:]
     main(targets)
-
-
-
-
 
 
