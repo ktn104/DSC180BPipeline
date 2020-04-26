@@ -8,5 +8,6 @@ T2D_data/
 __pycache__
 
 #ignore all the notebook checkpoints 
-src/*.ipynb_checkpoints
-src/*.pyc
+*.ipynb_checkpoints
+
+*.pyc
