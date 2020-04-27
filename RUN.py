@@ -5,7 +5,7 @@ import os
 
 sys.path.insert(0, 'src') # add library code to path
 
-from ETL import download_file #add download functions
+from ETL import ftp_server_authen, download_file #add download functions
 
 from process import process_data #add process test data func
 
@@ -31,7 +31,10 @@ def main(targets):
         cfg = load_params(config)
         #recursively downloading all the test files
         for study in cfg['study']:
-            download_file(cfg['outpath'], study)
+            #grab the authenticated server
+            ftp = ftp_server_authen()
+            #download the data accordingly
+            download_file(ftp, cfg['outpath'], study)
     return
 
 if __name__ == '__main__':

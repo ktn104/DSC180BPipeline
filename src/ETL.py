@@ -15,8 +15,6 @@ def ftp_server_authen():
 
     return ftp
 
-#grab the authenticated server
-ftp = ftp_server_authen()
 
 def ftp_server(ftp, study_ref):
     """
@@ -43,24 +41,24 @@ def get_t2d_file_names(server):
     #make a list to store all teh sub files of one specific study
     file_listing = []
     #get the list of sub-directories at the current dir and append them to a list
-    ftp.retrlines("LIST", file_listing.append)
+    server.retrlines("LIST", file_listing.append)
     #only grab the bam files from the list 
     files = [i.split()[-1] for i in file_listing]
     #grab the harmonised dir
     harmo = [index for index, val in enumerate(files) if val == 'harmonised']
     subdir = files[harmo[0]] + '/'
     #go the directory
-    ftp.cwd(subdir)
+    server.cwd(subdir)
     
     #make a list to store all teh sub files of one specific study
     sub_files = []
     #get the list of sub-directories at the current dir and append them to a list
-    ftp.retrlines("LIST", sub_files.append)
+    server.retrlines("LIST", sub_files.append)
     #only grab the bam files from the list 
     tsvs = [i.split()[-1] for i in sub_files if i.split()[-1][-2:] == 'gz']
     return tsvs
 
-def download_file(outdir, study_ref):
+def download_file(ftp, outdir, study_ref):
     """
     Function call to download bam files
     """
@@ -108,6 +106,8 @@ def download_file(outdir, study_ref):
             ftp.retrbinary("RETR " + fn, one_file.write) 
             one_file.close()
             print("successfully downloaded the file: " + str(fn))
-    
+    #go back to the parent dir 
+    os.chdir("..")
+    os.chdir("..")
     #close the ftp server after downloading for one study
     ftp.close()
