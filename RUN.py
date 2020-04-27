@@ -1,4 +1,3 @@
-import json
 import sys
 import shutil
 import os
@@ -9,6 +8,7 @@ from ETL import ftp_server_authen, download_file #add download functions
 
 from process import process_data #add process test data func
 
+from Clean_EDA import read_gz, clean_df, create_histogram, manhattan_plot 
 
 #load json config files
 config = 'config/data-param.json'
@@ -35,10 +35,15 @@ def main(targets):
             ftp = ftp_server_authen()
             #download the data accordingly
             download_file(ftp, cfg['outpath'], study)
+    if 'clean' in targets:
+        data = read_gz(T2D_data)
+        clean_data = clean_df(data)
+        histogram = create_histograms(clean_data,10)
+        manhattan = manhattan_plot(clean_data, 10)
+        
+        
     return
 
 if __name__ == '__main__':
     targets = sys.argv[1:]
     main(targets)
-
-
