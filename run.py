@@ -1,6 +1,7 @@
 import sys
 import shutil
 import os
+import pandas as pd
 
 sys.path.insert(0, 'src') # add library code to path
 
@@ -8,7 +9,9 @@ from ETL import ftp_server_authen, download_file #add download functions
 
 from process import process_data #add process test data func
 
-from Clean_EDA import read_gz, clean_df, create_histogram, manhattan_plot 
+from Clean_EDA import read_gz, clean_df
+
+from Analyze import create_histogram, manhattan_plot, combine, qq_plot
 
 #load json config files
 config = 'config/data-param.json'
@@ -40,6 +43,19 @@ def main(targets):
         clean_data = clean_df(data)
         histogram = create_histograms(clean_data,10)
         manhattan = manhattan_plot(clean_data, 10)
+    if 'test-project' in targets:
+        source = pd.read_csv('source_testdata1.csv', sep='\t')
+        source1 = pd.read_csv('source_testdata2.csv', sep='\t')
+        source2 = pd.read_csv('source_testdata3.csv', sep='\t')
+        source3 = pd.read_csv('source_testdata4.csv', sep='\t')
+        source4 = pd.read_csv('source_testdata5.csv', sep='\t')
+        create_histogram(source,50)
+        metal = pd.read_csv('metal_testdata.csv', sep='\t')
+        metal = combine(source,source1,source2,source3,source4,metal)
+        manhattan_plot(metal, 50)
+        qq_plot(metal)
+        
+        
         
         
     return
