@@ -7,8 +7,6 @@ sys.path.insert(0, 'src') # add library code to path
 
 from ETL import ftp_server_authen, download_file #add download functions
 
-from process import process_data #add process test data func
-
 from Clean_EDA import read_gz, clean_df
 
 from Analyze import create_histogram, manhattan_plot, combine, qq_plot
