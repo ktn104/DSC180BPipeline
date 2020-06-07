@@ -39,20 +39,29 @@ def main(targets):
             #download the data accordingly
             download_file(ftp, cfg['outpath'], study)
     if 'clean' in targets:
+        #read the data in 
         data = read_gz(T2D_data)
+        #clean it
         clean_data = clean_df(data)
+        #create histogram plot
         histogram = create_histograms(clean_data,10)
+        #create manhattan plot
         manhattan = manhattan_plot(clean_data, 10)
     if 'test-project' in targets:
+        #read in data
         source = pd.read_csv('source_testdata1.csv', sep='\t')
         source1 = pd.read_csv('source_testdata2.csv', sep='\t')
         source2 = pd.read_csv('source_testdata3.csv', sep='\t')
         source3 = pd.read_csv('source_testdata4.csv', sep='\t')
         source4 = pd.read_csv('source_testdata5.csv', sep='\t')
+        #create histogram
         create_histogram(source,50)
+        #read in data and combine them
         metal = pd.read_csv('metal_testdata.csv', sep='\t')
         metal = combine(source,source1,source2,source3,source4,metal)
+        #create manhattan plot
         manhattan_plot(metal, 50)
+        #create qqplot
         qq_plot(metal)
         
         

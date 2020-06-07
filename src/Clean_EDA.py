@@ -10,17 +10,19 @@ import matplotlib.pyplot as plt
 
 
 
-
+#function to read in data from gz files
 def read_gz(gz):
     with gzip.open(str(gz)) as f:
         features_train = pd.read_csv(f, sep='\t')
     return features_train
-
+#clean the data frame
 def clean_df(source):
+    #gets rid of null columns
     source = source.drop(['hm_beta','hm_odds_ratio','hm_ci_lower','hm_ci_upper','standard_error','ci_lower','odds_ratio','beta','ci_upper'],axis=1)
+    #gets rid of null values
     source = source.dropna()
     return source
-
+#function to run metal commands
 def metal_commands():
     cmd = shlex.split('./metal')
     cmd1 = shlex.split('MARKER variant_id')

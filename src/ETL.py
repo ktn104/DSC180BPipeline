@@ -3,7 +3,7 @@ import ftplib
 import zipfile
 import gzip
 
-
+#fucntion to connect to FTP
 def ftp_server_authen():
     """
     a function call to connect and authenticate a ftp server
@@ -15,7 +15,7 @@ def ftp_server_authen():
 
     return ftp
 
-
+#function to retrieve ftp data
 def ftp_server(ftp, study_ref):
     """
     a function call to change to a specific study subdir
@@ -33,7 +33,7 @@ def ftp_server(ftp, study_ref):
     ftp.cwd(studyDir)
     #ftp.retrlines("LIST")
 
-
+#function to grab t2d data
 def get_t2d_file_names(server):
     """
     a function call to save all the useful T2D files into a list within the current directory
@@ -58,6 +58,7 @@ def get_t2d_file_names(server):
     tsvs = [i.split()[-1] for i in sub_files if i.split()[-1][-2:] == 'gz']
     return tsvs
 
+#fucntion to download the data
 def download_file(ftp, outdir, study_ref):
     """
     Function call to download bam files
